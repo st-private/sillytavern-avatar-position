@@ -162,7 +162,7 @@ function showChatOverlay(who, type) {
         ? { id:'avp_s_a', label:'Top',    min:-400, max:400, val:base.top,  unit:'px' }
         : { id:'avp_s_a', label:'X 轴',   min:0,    max:100, val:base.objX, unit:'%'  };
     const sliderB = isPos
-        ? { id:'avp_s_b', label:'Left',   min:-1000, max:1000, val:base.left, unit:'px' }
+        ? { id:'avp_s_b', label:'Left',   min:-400, max:400, val:base.left, unit:'px' }
         : { id:'avp_s_b', label:'Y 轴',   min:0,    max:100, val:base.objY, unit:'%'  };
 
     const panel = $(`
