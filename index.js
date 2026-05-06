@@ -8,20 +8,19 @@ const DEFAULTS = {
     char: {}
 };
 
-// ── 获取当前主题名称 ──────────────────────────────────────
+// ── 获取当前主题标识 ──────────────────────────────────────
 function getCurrentTheme() {
-    // 获取 SillyTavern 当前使用的主题名，如果没有则返回 'default'
-    return $('#style_file').val() || 'default';
+    // 获取当前选中的 CSS 文件名，如果没有则使用 default
+    return jQuery('#style_file').val() || 'default';
 }
 
-
-// ── 存储逻辑修改 ────────────────────────────────────────────
+// ── 存储逻辑（带主题隔离） ───────────────────────────────────
 function load() {
     try {
         const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-        const currentTheme = getCurrentTheme();
-        // 返回当前主题下的数据，如果没有则返回默认结构
-        return allData[currentTheme] || structuredClone(DEFAULTS);
+        const theme = getCurrentTheme();
+        // 只返回当前主题下的配置，如果没有则返回初始默认值
+        return allData[theme] || structuredClone(DEFAULTS);
     }
     catch { return structuredClone(DEFAULTS); }
 }
@@ -29,16 +28,17 @@ function load() {
 function save(currentThemeData) {
     try {
         const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-        const currentTheme = getCurrentTheme();
-        allData[currentTheme] = currentThemeData;
+        const theme = getCurrentTheme();
+        allData[theme] = currentThemeData;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
     } catch (e) {
         console.error("AVP Save Error:", e);
     }
 }
+
 // ── 应用样式 ─────────────────────────────────────────
 function applyStyle() {
-    const data = load(); // 此时 load 已经只返回当前主题的数据了
+    const data     = load();
     const charName = getContext()?.name2;
     const c = (charName && data.char?.[charName]) || { top: 0, left: 0, objX: 50, objY: 50 };
     const u = data.user || DEFAULTS.user;
@@ -55,31 +55,7 @@ function applyStyle() {
     `;
 }
 
-// ── 初始化监听 ───────────────────────────────────────────
-jQuery(async () => {
-    createSettingsButton();
-    applyStyle();
-    
-    // 监听角色切换
-    document.addEventListener('characterSelected', () => { applyStyle(); });
-    
-    // 重要：监听主题切换。当主题下拉框改变时，重新应用样式
-    $(document).on('change', '#style_file', () => {
-        setTimeout(applyStyle, 100); // 略微延迟确保 DOM 加载
-    });
-});
-
-// ── 读当前草稿（未保存的预览值）─────────────────────
-let _draft = null;   // { who:'user'|'char', type:'pos'|'obj', top, left, objX, objY }
-
-function getDraftBase(who) {
-    const data     = load();
-    const charName = getContext()?.name2;
-    if (who === 'user') return { ...DEFAULTS.user, ...data.user };
-    return { top:0, left:0, objX:50, objY:50, ...(charName && data.char?.[charName]) };
-}
-
-// ── 临时预览（不写 localStorage）────────────────────
+// ── 预览逻辑（保持不变，但需适配 load） ─────────────────────
 function previewDraft(draft) {
     const data     = load();
     const charName = getContext()?.name2;
@@ -98,8 +74,19 @@ function previewDraft(draft) {
     `;
 }
 
+// ── 获取草稿基础值 ───────────────────────────────────
+function getDraftBase(who) {
+    const data = load();
+    const charName = getContext()?.name2;
+    if (who === 'user') return { ...DEFAULTS.user, ...data.user };
+    return { top:0, left:0, objX:50, objY:50, ...(charName && data.char?.[charName]) };
+}
+
 // ── 1. 扩展设置里的入口按钮 ──────────────────────────
 function createSettingsButton() {
+    // 先移除可能存在的旧按钮，防止重复
+    $('#avp-settings-entry').remove();
+    
     const wrap = $(`
         <div id="avp-settings-entry">
             <div class="avp-entry-label">Avatar Position</div>
@@ -335,5 +322,12 @@ function overlayStatus(msg, color) {
 jQuery(async () => {
     createSettingsButton();
     applyStyle();
+    
+    // 监听角色切换
     document.addEventListener('characterSelected', () => { applyStyle(); });
+    
+    // 监听主题切换，自动更新头像位置
+    $(document).on('change', '#style_file', () => {
+        setTimeout(applyStyle, 150); 
+    });
 });
