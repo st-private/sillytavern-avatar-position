@@ -159,10 +159,10 @@ function showChatOverlay(who, type) {
     const typeLabel = isPos ? '位置偏移' : '图片焦点';
 
     const sliderA = isPos
-        ? { id:'avp_s_a', label:'Top',    min:-100, max:100, val:base.top,  unit:'px' }
+        ? { id:'avp_s_a', label:'Top',    min:-400, max:400, val:base.top,  unit:'px' }
         : { id:'avp_s_a', label:'X 轴',   min:0,    max:100, val:base.objX, unit:'%'  };
     const sliderB = isPos
-        ? { id:'avp_s_b', label:'Left',   min:-100, max:100, val:base.left, unit:'px' }
+        ? { id:'avp_s_b', label:'Left',   min:-1000, max:1000, val:base.left, unit:'px' }
         : { id:'avp_s_b', label:'Y 轴',   min:0,    max:100, val:base.objY, unit:'%'  };
 
     const panel = $(`
