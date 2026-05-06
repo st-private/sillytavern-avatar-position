@@ -26,9 +26,10 @@ function applyStyle() {
     if (!el) { el = document.createElement('style'); el.id = 'avp-injected-style'; document.head.appendChild(el); }
 
     el.textContent = `
-        #chat .mes[is_user="true"] .avatar        { position:absolute; top:${u.top}px; left:${u.left}px; }
-        #chat .mes[is_user="true"] .avatar img    { object-position:${u.objX}% ${u.objY}%; }
-        #chat .mes[is_user="false"] .avatar  { position:absolute; top:${c.top}px; left:${c.left}px; }
+         #chat .mes[is_user="true"] .avatar      { transform: translate(${u.left}px, ${u.top}px); }
+        #chat .mes[is_user="true"] .avatar img  { object-position:${u.objX}% ${u.objY}%; }
+        
+        #chat .mes[is_user="false"] .avatar     { transform: translate(${c.left}px, ${c.top}px); }
         #chat .mes[is_user="false"] .avatar img { object-position:${c.objX}% ${c.objY}%; }
     `;
 }
@@ -54,10 +55,11 @@ function previewDraft(draft) {
     const c = draft.who === 'char' ? draft : { top:0, left:0, objX:50, objY:50, ...(charName && data.char?.[charName]) };
 
     el.textContent = `
-        #chat .mes[is_user="true"] .avatar        { position:absolute; top:${u.top}px; left:${u.left}px; }
-        #chat .mes[is_user="true"] .avatar img    { object-position:${u.objX}% ${u.objY}%; }
-        #chat .mes[is_user="false"] .avatar  { position:absolute; top:${c.top}px; left:${c.left}px; }
-        #chat .mes[is_user="false"] img { object-position:${c.objX}% ${c.objY}%; }
+        #chat .mes[is_user="true"] .avatar      { transform: translate(${u.left}px, ${u.top}px); }
+        #chat .mes[is_user="true"] .avatar img  { object-position:${u.objX}% ${u.objY}%; }
+        
+        #chat .mes[is_user="false"] .avatar     { transform: translate(${c.left}px, ${c.top}px); }
+        #chat .mes[is_user="false"] .avatar img { object-position:${c.objX}% ${c.objY}%; }
     `;
 }
 
@@ -159,10 +161,10 @@ function showChatOverlay(who, type) {
     const typeLabel = isPos ? '位置偏移' : '图片焦点';
 
     const sliderA = isPos
-        ? { id:'avp_s_a', label:'Top',    min:-400, max:400, val:base.top,  unit:'px' }
+        ? { id:'avp_s_a', label:'Top',    min:-200, max:200, val:base.top,  unit:'px' }
         : { id:'avp_s_a', label:'X 轴',   min:0,    max:100, val:base.objX, unit:'%'  };
     const sliderB = isPos
-        ? { id:'avp_s_b', label:'Left',   min:-400, max:400, val:base.left, unit:'px' }
+        ? { id:'avp_s_b', label:'Left',   min:-200, max:200, val:base.left, unit:'px' }
         : { id:'avp_s_b', label:'Y 轴',   min:0,    max:100, val:base.objY, unit:'%'  };
 
     const panel = $(`
