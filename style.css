@@ -1,0 +1,347 @@
+/* ── 入口按钮区 ─────────────────────────────────────── */
+*{
+    text-shadow: none;
+}
+#avp-settings-entry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 2px;
+    gap: 12px;
+}
+
+.avp-entry-label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    opacity: 0.75;
+}
+
+.avp-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.08);
+    color: inherit;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, transform 0.12s;
+}
+.avp-btn-primary:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.32);
+    transform: translateY(-1px);
+}
+.avp-btn-primary:active { transform: translateY(0); }
+
+.avp-btn-icon { font-size: 14px; opacity: 0.8; }
+
+/* ── 模态弹窗 ────────────────────────────────────────── */
+#avp-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.24s ease;
+    padding: 16px;
+}
+#avp-modal-overlay.avp-visible { opacity: 1; }
+
+#avp-modal {
+    /* background: rgba(22, 22, 28, 0.96); */
+    background: var(--SmartThemeBlurTintColor, #FFDBFB);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 340px;
+    /* box-shadow: 0 24px 64px rgba(0,0,0,0.6); */
+    transform: translateY(12px) scale(0.97);
+    transition: transform 0.24s cubic-bezier(0.34,1.3,0.64,1);
+    overflow: hidden;
+}
+#avp-modal-overlay.avp-visible #avp-modal {
+    transform: translateY(0) scale(1);
+}
+
+.avp-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.avp-modal-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.6;
+}
+
+.avp-close-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    color: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+/* .avp-close-btn:hover { background: rgba(255,255,255,0.14); } */
+
+.avp-modal-body { padding: 14px 18px 18px; }
+
+.avp-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avp-section-tag {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    padding: 3px 7px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    width: 48px;
+    text-align: center;
+}
+
+.avp-option-group {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+}
+
+.avp-option-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: inherit;
+    cursor: pointer;
+    /* transition: background 0.15s, border-color 0.15s, transform 0.12s; */
+    text-align: center;
+}
+.avp-option-btn:hover {
+    /* background: rgba(255,255,255,0.1); */
+    border-color: rgba(255,255,255,0.22);
+    transform: translateY(-1px);
+}
+.avp-option-btn:active { transform: translateY(0); }
+
+.avp-opt-icon {
+    font-size: 15px;
+    line-height: 1;
+    opacity: 0.7;
+}
+.avp-opt-label {
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.avp-opt-sub {
+    font-size: 9px;
+    opacity: 0.45;
+    letter-spacing: 0.03em;
+    font-family: monospace;
+}
+
+.avp-divider {
+    height: 1px;
+    /* background: rgba(255,255,255,0.07); */
+    margin: 12px 0;
+}
+
+/* ── 颜色标签 ─────────────────────────────────────────── */
+.char-tag {
+    /* background: rgba(139,92,246,0.25); */
+    /* color: #c4b5fd; */
+    /* border: 1px solid rgba(139,92,246,0.3); */
+}
+.user-tag {
+    /* background: rgba(34,197,94,0.18); */
+    /* color: #86efac; */
+    /* border: 1px solid rgba(34,197,94,0.25); */
+}
+
+/* ── Chat 内悬浮面板 ──────────────────────────────────── */
+#avp-chat-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.22s;
+}
+#avp-chat-overlay.avp-visible { opacity: 1; }
+
+#avp-chat-panel {
+    position: absolute;
+    bottom: 80px;
+    right: 16px;
+    width: 280px;
+    /* background: rgba(18, 18, 22, 0.94); */
+    background: var(--SmartThemeBlurTintColor, #FFDBFB);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    /* box-shadow: 0 16px 48px rgba(0,0,0,0.55); */
+    backdrop-filter: blur(12px);
+    pointer-events: all;
+    transform: translateY(8px);
+    transition: transform 0.22s cubic-bezier(0.34,1.2,0.64,1);
+    overflow: hidden;
+    user-select: none;
+}
+#avp-chat-overlay.avp-visible #avp-chat-panel {
+    transform: translateY(0);
+}
+
+.avp-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    cursor: grab;
+}
+.avp-panel-header:active { cursor: grabbing; }
+
+.avp-panel-tags {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.avp-tag {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.avp-tag-label {
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.avp-slider-block {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.avp-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.avp-slider-label {
+    font-size: 11px;
+    font-weight: 600;
+    width: 32px;
+    flex-shrink: 0;
+    opacity: 0.55;
+    letter-spacing: 0.02em;
+}
+
+.avp-slider-row input[type="range"] {
+    flex: 1;
+    min-width: 0;
+    accent-color: rgba(255,255,255,0.7);
+    height: 20px;
+    cursor: pointer;
+}
+
+.avp-slider-val {
+    font-size: 11px;
+    font-family: monospace;
+    width: 36px;
+    text-align: right;
+    opacity: 0.8;
+    flex-shrink: 0;
+}
+
+.avp-panel-footer {
+    display: flex;
+    gap: 6px;
+    padding: 0 14px 12px;
+}
+
+.avp-btn-ghost {
+    flex: 1;
+    padding: 6px 0;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 7px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.05);
+    color: inherit;
+    cursor: pointer;
+    transition: background 0.14s;
+    letter-spacing: 0.02em;
+}
+.avp-btn-ghost:hover { background: rgba(255,255,255,0.1); }
+
+.avp-btn-save {
+    flex: 2;
+    padding: 6px 0;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 7px;
+    /* border: 1px solid rgba(74,222,128,0.35); */
+    background: rgba(255,255,255,0.05);
+    /* background: rgba(74,222,128,0.15); */
+    /* color: #86efac; */
+    cursor: pointer;
+    transition: background 0.14s, transform 0.1s;
+    letter-spacing: 0.04em;
+}
+/* .avp-btn-save:hover { background: rgba(74,222,128,0.25); } */
+.avp-btn-save:active { transform: scale(0.97); }
+
+.avp-panel-status {
+    padding: 0 14px 8px;
+    font-size: 11px;
+    min-height: 18px;
+    text-align: center;
+    opacity: 0.85;
+    transition: opacity 0.2s;
+}
+
+/* ── 移动端适配 ────────────────────────────────────────── */
+@media (max-width: 480px) {
+    #avp-chat-panel {
+        width: calc(100vw - 24px);
+        right: 12px;
+        bottom: 70px;
+    }
+    .avp-option-btn { padding: 9px 6px; }
+    .avp-opt-label  { font-size: 10px; }
+}
