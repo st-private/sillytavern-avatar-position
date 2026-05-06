@@ -1,5 +1,3 @@
-import { getContext } from '../../extensions.js';
-
 const EXT_NAME  = 'avatar-position';
 const STORAGE_KEY = 'avp_settings';
 
