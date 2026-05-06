@@ -26,9 +26,9 @@ function applyStyle() {
     if (!el) { el = document.createElement('style'); el.id = 'avp-injected-style'; document.head.appendChild(el); }
 
     el.textContent = `
-        #chat .mes[is_user="true"] .avatar        { position:relative; top:${u.top}px; left:${u.left}px; }
+        #chat .mes[is_user="true"] .avatar        { position:absolute; top:${u.top}px; left:${u.left}px; }
         #chat .mes[is_user="true"] .avatar img    { object-position:${u.objX}% ${u.objY}%; }
-        #chat .mes[is_user="false"] .avatar  { position:relative; top:${c.top}px; left:${c.left}px; }
+        #chat .mes[is_user="false"] .avatar  { position:absolute; top:${c.top}px; left:${c.left}px; }
         #chat .mes[is_user="false"] .avatar img { object-position:${c.objX}% ${c.objY}%; }
     `;
 }
@@ -54,9 +54,9 @@ function previewDraft(draft) {
     const c = draft.who === 'char' ? draft : { top:0, left:0, objX:50, objY:50, ...(charName && data.char?.[charName]) };
 
     el.textContent = `
-        #chat .mes[is_user="true"] .avatar        { position:relative; top:${u.top}px; left:${u.left}px; }
+        #chat .mes[is_user="true"] .avatar        { position:absolute; top:${u.top}px; left:${u.left}px; }
         #chat .mes[is_user="true"] .avatar img    { object-position:${u.objX}% ${u.objY}%; }
-        #chat .mes[is_user="false"] .avatar  { position:relative; top:${c.top}px; left:${c.left}px; }
+        #chat .mes[is_user="false"] .avatar  { position:absolute; top:${c.top}px; left:${c.left}px; }
         #chat .mes[is_user="false"] img { object-position:${c.objX}% ${c.objY}%; }
     `;
 }
