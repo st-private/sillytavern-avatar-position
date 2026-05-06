@@ -127,13 +127,11 @@ function showModal() {
                 <div class="avp-modal-body">
                     <div class="avp-who-row">
                         <button class="avp-who-btn char-btn" data-who="char">
-                            <span class="avp-who-icon">🎭</span>
                             <span class="avp-section-tag char-tag">CHAR</span>
                             <span class="avp-who-desc">角色头像焦点</span>
                         </button>
                         <div class="avp-who-divider"></div>
                         <button class="avp-who-btn user-btn" data-who="user">
-                            <span class="avp-who-icon">👤</span>
                             <span class="avp-section-tag user-tag">USER</span>
                             <span class="avp-who-desc">用户头像焦点</span>
                         </button>
