@@ -125,15 +125,15 @@ function showModal() {
                     <button class="avp-close-btn" id="avp-modal-close">✕</button>
                 </div>
                 <div class="avp-modal-body">
-                    <div class="avp-section">
-                        <button class="avp-who-btn" data-who="char">
+                    <div class="avp-who-row">
+                        <button class="avp-who-btn char-btn" data-who="char">
+                            <span class="avp-who-icon">🎭</span>
                             <span class="avp-section-tag char-tag">CHAR</span>
                             <span class="avp-who-desc">角色头像焦点</span>
                         </button>
-                    </div>
-                    <div class="avp-divider"></div>
-                    <div class="avp-section">
-                        <button class="avp-who-btn" data-who="user">
+                        <div class="avp-who-divider"></div>
+                        <button class="avp-who-btn user-btn" data-who="user">
+                            <span class="avp-who-icon">👤</span>
                             <span class="avp-section-tag user-tag">USER</span>
                             <span class="avp-who-desc">用户头像焦点</span>
                         </button>
@@ -208,6 +208,7 @@ function showChatOverlay(who) {
     // ── 拖动 ──────────────────────────────────────────
     let dragging = false, startX, startY;
     panel.find('.avp-panel-header').on('mousedown touchstart', function (e) {
+        if (jQuery(e.target).closest('.avp-close-btn').length) return;
         dragging = true;
         const pt     = e.touches ? e.touches[0] : e;
         const offset = panel.find('#avp-chat-panel').offset();
