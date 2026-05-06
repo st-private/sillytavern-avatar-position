@@ -8,16 +8,37 @@ const DEFAULTS = {
     char: {}
 };
 
-// ── 存储 ────────────────────────────────────────────
+// ── 获取当前主题名称 ──────────────────────────────────────
+function getCurrentTheme() {
+    // 获取 SillyTavern 当前使用的主题名，如果没有则返回 'default'
+    return $('#style_file').val() || 'default';
+}
+
+
+// ── 存储逻辑修改 ────────────────────────────────────────────
 function load() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || structuredClone(DEFAULTS); }
+    try {
+        const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        const currentTheme = getCurrentTheme();
+        // 返回当前主题下的数据，如果没有则返回默认结构
+        return allData[currentTheme] || structuredClone(DEFAULTS);
+    }
     catch { return structuredClone(DEFAULTS); }
 }
-function save(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 
+function save(currentThemeData) {
+    try {
+        const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        const currentTheme = getCurrentTheme();
+        allData[currentTheme] = currentThemeData;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+    } catch (e) {
+        console.error("AVP Save Error:", e);
+    }
+}
 // ── 应用样式 ─────────────────────────────────────────
 function applyStyle() {
-    const data     = load();
+    const data = load(); // 此时 load 已经只返回当前主题的数据了
     const charName = getContext()?.name2;
     const c = (charName && data.char?.[charName]) || { top: 0, left: 0, objX: 50, objY: 50 };
     const u = data.user || DEFAULTS.user;
@@ -26,13 +47,27 @@ function applyStyle() {
     if (!el) { el = document.createElement('style'); el.id = 'avp-injected-style'; document.head.appendChild(el); }
 
     el.textContent = `
-         #chat .mes[is_user="true"] .avatar      { transform: translate(${u.left}px, ${u.top}px); }
+        #chat .mes[is_user="true"] .avatar      { transform: translate(${u.left}px, ${u.top}px); }
         #chat .mes[is_user="true"] .avatar img  { object-position:${u.objX}% ${u.objY}%; }
         
         #chat .mes[is_user="false"] .avatar     { transform: translate(${c.left}px, ${c.top}px); }
         #chat .mes[is_user="false"] .avatar img { object-position:${c.objX}% ${c.objY}%; }
     `;
 }
+
+// ── 初始化监听 ───────────────────────────────────────────
+jQuery(async () => {
+    createSettingsButton();
+    applyStyle();
+    
+    // 监听角色切换
+    document.addEventListener('characterSelected', () => { applyStyle(); });
+    
+    // 重要：监听主题切换。当主题下拉框改变时，重新应用样式
+    $(document).on('change', '#style_file', () => {
+        setTimeout(applyStyle, 100); // 略微延迟确保 DOM 加载
+    });
+});
 
 // ── 读当前草稿（未保存的预览值）─────────────────────
 let _draft = null;   // { who:'user'|'char', type:'pos'|'obj', top, left, objX, objY }
