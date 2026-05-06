@@ -337,11 +337,21 @@
 
 /* ── 移动端适配 ────────────────────────────────────────── */
 @media (max-width: 480px) {
+
+#avp-modal {
+    position: absolute;
+    right: 12px;
+    top: 50vh;
+}
     #avp-chat-panel {
-        width: calc(100vw - 24px);
-        right: 12px;
-        bottom: 70px;
+        bottom: -40vh;
     }
+    #avp-chat-overlay{
+        width: calc(100vw - 24px)!important;
+        right: 12px;
+        top: 50vh;
+    }
+
     .avp-option-btn { padding: 9px 6px; }
     .avp-opt-label  { font-size: 10px; }
 }
