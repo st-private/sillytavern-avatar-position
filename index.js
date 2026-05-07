@@ -1,12 +1,13 @@
 import { getContext } from '../../../extensions.js';
 
 // ── 常量 ─────────────────────────────────────────────
-const STORAGE_KEY = 'avp_settings';
-const ANIM_MS     = 260; // 与 CSS transition 保持同步
+const USER_KEY = 'avp_user_settings'; // 全局用户头像设置，不跟主题走
+const CHAR_KEY = 'avp_char_settings'; // 全局角色头像设置，不跟主题走
+const ANIM_MS  = 260; // 与 CSS transition 保持同步
 
 const DEFAULTS = { objX: 50, objY: 50 };
 
-// ── 主题检测 ─────────────────────────────────────────
+// ── 主题检测（仅保留用于日志，不再影响存储）────────────
 function getCurrentTheme() {
     const candidates = [
         jQuery('#style_file').val(),
@@ -15,38 +16,49 @@ function getCurrentTheme() {
     for (const val of candidates) {
         if (val && typeof val === 'string' && val.trim()) return val.trim();
     }
-    console.warn('[AVP] 无法检测当前主题，使用 "default"');
     return 'default';
 }
 
 // ── 存储 ─────────────────────────────────────────────
+/**
+ * 读取全部设置。
+ * 结构：{ user: { objX, objY }, char: { "角色名": { objX, objY }, ... } }
+ * user  → avp_user_settings（单一全局对象，与主题无关）
+ * char  → avp_char_settings（以角色名为 key，与主题无关）
+ */
 function load() {
     try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const allData = raw ? JSON.parse(raw) : {};
-        const theme = getCurrentTheme();
-        return allData[theme]
-            ? structuredClone(allData[theme])
-            : { user: { ...DEFAULTS }, char: {} };
+        // ── user ──────────────────────────────────────
+        const rawUser = localStorage.getItem(USER_KEY);
+        const userData = rawUser ? JSON.parse(rawUser) : { ...DEFAULTS };
+
+        // ── char ──────────────────────────────────────
+        const rawChar  = localStorage.getItem(CHAR_KEY);
+        const charData = rawChar ? JSON.parse(rawChar) : {};
+
+        return { user: structuredClone(userData), char: charData };
     } catch (e) {
-        console.error('[AVP] 读取失败:', e, {
-            theme: getCurrentTheme(),
-            raw: localStorage.getItem(STORAGE_KEY),
-        });
+        console.error('[AVP] 读取失败:', e);
         return { user: { ...DEFAULTS }, char: {} };
     }
 }
 
+/**
+ * 保存全部设置。
+ * user  → avp_user_settings
+ * char  → avp_char_settings
+ */
 function save(themeData) {
     try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const allData = raw ? JSON.parse(raw) : {};
-        const theme = getCurrentTheme();
-        allData[theme] = themeData;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+        // ── user ──────────────────────────────────────
+        localStorage.setItem(USER_KEY, JSON.stringify(themeData.user ?? DEFAULTS));
+
+        // ── char ──────────────────────────────────────
+        localStorage.setItem(CHAR_KEY, JSON.stringify(themeData.char ?? {}));
+
         return true;
     } catch (e) {
-        console.error('[AVP] 保存失败:', e, { theme: getCurrentTheme() });
+        console.error('[AVP] 保存失败:', e);
         return false;
     }
 }
@@ -125,13 +137,15 @@ function showModal() {
                     <button class="avp-close-btn" id="avp-modal-close">✕</button>
                 </div>
                 <div class="avp-modal-body">
-                    <div class="avp-who-row">
-                        <button class="avp-who-btn char-btn" data-who="char">
+                    <div class="avp-section">
+                        <button class="avp-who-btn" data-who="char">
                             <span class="avp-section-tag char-tag">CHAR</span>
                             <span class="avp-who-desc">角色头像焦点</span>
                         </button>
-                        <div class="avp-who-divider"></div>
-                        <button class="avp-who-btn user-btn" data-who="user">
+                    </div>
+                    <div class="avp-divider"></div>
+                    <div class="avp-section">
+                        <button class="avp-who-btn" data-who="user">
                             <span class="avp-section-tag user-tag">USER</span>
                             <span class="avp-who-desc">用户头像焦点</span>
                         </button>
@@ -168,7 +182,7 @@ function showChatOverlay(who) {
         ? { ...DEFAULTS, ...data.user }
         : { ...DEFAULTS, ...(charName ? (data.char?.[charName] ?? {}) : {}) };
 
-    const draft = { ...base }; // 局部变量，不污染模块作用域
+    const draft = { ...base };
 
     const panel = jQuery(`
         <div id="avp-chat-overlay">
@@ -194,7 +208,7 @@ function showChatOverlay(who) {
                 </div>
                 <div class="avp-panel-footer">
                     <button class="avp-btn-ghost" id="avp-overlay-reset">重置</button>
-                    <button class="avp-btn-save"  id="avp-overlay-save">保存到当前主题</button>
+                    <button class="avp-btn-save"  id="avp-overlay-save">保存</button>
                 </div>
                 <div class="avp-panel-status" id="avp-panel-status"></div>
             </div>
@@ -206,7 +220,6 @@ function showChatOverlay(who) {
     // ── 拖动 ──────────────────────────────────────────
     let dragging = false, startX, startY;
     panel.find('.avp-panel-header').on('mousedown touchstart', function (e) {
-        if (jQuery(e.target).closest('.avp-close-btn').length) return;
         dragging = true;
         const pt     = e.touches ? e.touches[0] : e;
         const offset = panel.find('#avp-chat-panel').offset();
@@ -276,8 +289,9 @@ function showChatOverlay(who) {
 
         if (save(currentData)) {
             applyStyle();
+            // 保存成功提示不再显示主题名，因为设置已与主题解绑
             panel.find('#avp-panel-status')
-                .text(`已保存到主题: ${getCurrentTheme()} ✓`)
+                .text('已保存 ✓')
                 .css('color', '#4ade80');
             setTimeout(() => {
                 jQuery(document).off('.avp');
@@ -316,17 +330,12 @@ jQuery(() => {
     createSettingsButton();
     applyStyle();
 
-    // 角色切换事件
-    // 如果你的 ST 版本支持 eventSource，可改为：
-    //   import { eventSource, event_types } from '../../../../script.js';
-    //   eventSource.on(event_types.CHARACTER_SELECTED, () => setTimeout(applyStyle, 100));
+    // 角色切换时重新应用（角色设置是全局的，直接读取对应角色名的值即可）
     document.addEventListener('characterSelected', () => setTimeout(applyStyle, 100));
 
-    // 主题切换事件（同时监听两个候选选择器，兼容不同 ST 版本）
-    // ⚠️ 在控制台运行以下代码确认你的 ST 用哪个选择器：
-    //   console.log(jQuery('#style_file').val(), jQuery('#themes').val())
+    // 主题切换时也重新应用（user/char 设置不随主题变，但 CSS 注入需刷新）
     jQuery(document).on('change', '#style_file, #themes', () => {
-        console.log('[AVP] 主题切换为:', getCurrentTheme());
+        console.log('[AVP] 主题切换为:', getCurrentTheme(), '（头像焦点设置不受影响）');
         setTimeout(applyStyle, 200);
     });
 });
